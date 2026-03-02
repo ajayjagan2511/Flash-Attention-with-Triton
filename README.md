@@ -28,39 +28,6 @@ flash-attention-project/
 
 ```
 
-Ah, I see exactly what happened. The code blocks inside the README (like the bash and text snippets) were prematurely closing the outer markdown code block, breaking the formatting.
-
-To fix this so you get one perfect, copy-pasteable block, I will wrap the entire README in a four-backtick block. This will safely encapsulate the standard three-backtick blocks inside it.
-
-Here is the complete, single-piece README.md:
-
-Markdown
-# Custom FlashAttention in Triton
-
-This repository contains a from-scratch implementation of FlashAttention (V1 and V2) using OpenAI's Triton. The project demonstrates the progression from a naive $O(N^2)$ PyTorch attention mechanism to a highly optimized, hardware-aware Triton kernel that leverages tiling, SRAM memory management, and recomputation to drastically reduce memory bandwidth bottlenecks.
-
-## Implementations
-1. **Naive Attention (`naive_attention.py`)**: A standard mathematical implementation of scaled dot-product attention. It materializes the full $N \times N$ attention matrix, serving as the baseline for correctness and demonstrating the quadratic memory wall.
-2. **FlashAttention V1 (`flash_attention_v1.py` & `flash_attention_v1_tiled.py`)**: Implements the core online-softmax trick and SRAM tiling. Upgraded with proper tensor strides for PyTorch interoperability.
-3. **FlashAttention V2 (`flash_attention_v2.py`)**: Introduces major performance optimizations based on the FlashAttention-2 paper. It reorders the loops to parallelize over Query blocks (rather than iterating them internally), defers non-matmul operations (like scaling) to the end of the loop, and maximizes Streaming Multiprocessor (SM) utilization.
-
-## Project Structure
-```text
-flash-attention-project/
-│
-├── requirements.txt
-├── naive_attention.py
-├── flash_attention_v1.py
-├── flash_attention_v1_tiled.py
-├── flash_attention_v2.py
-├── helpers.py
-├── benchmarks.py
-├── main.py
-└── assets/               # Benchmark plots
-    ├── latency.png
-    ├── throughput.png
-    └── TFLOPS.png
-```
 
 ## Quick Start
 1. Install dependencies:
@@ -93,7 +60,7 @@ By V2, the Triton kernel achieves excellent hardware utilization, peaking at nea
 ![MHA TFLOPs/s](assets/TFLOPS.png)
 
 ### Raw Benchmark Data
-| N | D | H | torch_ms | naive_ms | triton_ms | torch_tflops | naive_tflops | triton_tflops |
+| N | D | H | torch_ms | naive_ms | triton_ms (V2) | torch_tflops | naive_tflops | triton_tflops (V2)|
 |---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | 256 | 2048 | 32 | 0.2510 | 12.5080 | 0.5016 | 2.1389 | 0.0429 | 1.0704 |
 | 512 | 2048 | 32 | 0.2565 | 12.5255 | 0.5035 | 8.3729 | 0.1714 | 4.2654 |
